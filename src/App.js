@@ -17,6 +17,7 @@ function App() {
         >
           Learn React. And this is updates version of this awesome website.
         </a>
+        <p>This is even better one! Because this is auto deployed!</p>
       </header>
     </div>
   );

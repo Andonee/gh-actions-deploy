@@ -14,22 +14,8 @@ jobs:
       - name: Test code
         id: run-tests
         run: npm run test
-  # build:
-  #   needs: test
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Get code
-  #       uses: actions/checkout@v3
-  #     - name: Install dependencies
-  #       run: npm ci
-  #     - name: Build website
-  #       run: npm run build
-  #     - name: Upload artifacts
-  #       uses: actions/upload-artifact@v3
-  #       with:
-  #         name: dist-files
-  #         path: build
   publish:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Set up QEMU
@@ -46,23 +32,19 @@ jobs:
         with:
           push: true
           tags: mpoprawa/reactapp:latest
-      # - name: Publish to Docker Hub
-      #   uses: docker/build-push-action@v4
-      #   with:
-      #     username: ${{ secrets.DOCKER_USERNAME }}
-      #     password: ${{ secrets.DOCKER_PASSWORD }}
-      #     repository: mpoprawa/reactapp
-      #     tags: latest
-  # deploy:
-  #   needs: build
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Get build artifacts
-  #       uses: actions/download-artifact@v3
-  #       with:
-  #         name: dist-files
-  #         path: ./build
-  #     - name: Output contents
-  #       run: ls -R
-  #     - name: Deploy site
-  #       run: echo "Deploying..."
+  deploy:
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: executing remote ssh commands
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.HOST_PASSWORD }}
+          # port: ${{ secrets.PORT }}
+          script: |
+            cd /var/www/reactapp
+            docker pull mpoprawa/reactapp:latest
+            docker compose down
+            docker compose up -d
