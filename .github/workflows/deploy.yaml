@@ -28,19 +28,19 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: dist-files
-          path: ./dist
+          path: .dist/
   deploy:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Get code
-        uses: actions/checkout@v3
+      # - name: Get code
+      #   uses: actions/checkout@v3
       - name: Get build artifacts
         uses: actions/download-artifact@v3
         with:
           name: dist-files
-          path: ./dist
+          # path: ./dist
       - name: Output contents
-        run: ls
+        run: ls -R
       - name: Deploy site
         run: echo "Deploying..."
